@@ -104,11 +104,14 @@
       getPattern,
       showChange,
       PATTERN_COLOR,
+      alertWin,
     } from "./modules/utils.js";
 
+    import { airingGo, setUserWin } from "./modules/ai.js";
     // 初始化一个15*15的棋盘
     let pattern = getPattern();
-    let color = 2;
+    // 电脑是2，玩家是1
+    let color = 1;
     function show() {
       // 显示所有元素
       let board = document.getElementById("board");
@@ -138,62 +141,29 @@
       pattern[index] = color;
       showChange(pattern, i, j);
       if (check(pattern, color, i, j)) {
-        setTimeout(() => {
-          alert(PATTERN_COLOR[3 - color] + " is winner!");
-        });
+        alertWin(color);
       }
+      setUserWin(i, j);
       color = 3 - color;
 
-      if (willWin(pattern, color)) {
-        console.log(PATTERN_COLOR[color] + " will win");
-      }
-      //   console.log(bestChoice(pattern, color));
-      //   computerMove();
+      // if (willWin(pattern, color)) {
+      //   console.log(PATTERN_COLOR[color] + " will win");
+      // }
+      computerMove();
     }
     function computerMove() {
-      let choice = bestChoice(pattern, color);
-      if (choice.point) {
-        pattern[choice.point[0] * 3 + choice.point[1]] = color;
-      }
-      if (check(pattern, color)) {
-        alert(color == 2 ? "x will win!" : "o will win");
+      let choice = airingGo(pattern);
+      console.log("computerMove", choice);
+
+      pattern[choice[0] * 15 + choice[1]] = color;
+
+      if (check(pattern, color, choice[0], choice[1])) {
+        alertWin(color);
       }
       color = 3 - color;
-      show();
+      show(choice[0], choice[1]);
     }
 
-    function bestChoice(pattern, color) {
-      let p;
-      // 假如要赢，直接返回
-      if ((p = willWin(pattern, color))) {
-        return {
-          point: p,
-          result: 1,
-        };
-      }
-      let result = -2;
-      let point = null;
-
-      outer: for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-          if (pattern[i * 3 + j]) {
-            continue;
-          }
-          let tmp = clone(pattern);
-          tmp[i * 3 + j] = color;
-          // 计算对方的result,确保本方大于对方
-          let r = bestChoice(tmp, 3 - color).result;
-          if (-r > result) {
-            result = -r;
-            point = [i, j];
-          }
-          if (result == 1) {
-            break outer;
-          }
-        }
-      }
-      return { point, result: point ? result : 0 };
-    }
     show();
   </script>
 </html>

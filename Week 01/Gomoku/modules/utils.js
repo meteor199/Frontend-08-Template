@@ -100,9 +100,9 @@ export function check(pattern, color, rowIndex, colIndex) {
   {
     // 反斜向
     // 最小值的偏移量
-    let minOffset = Math.min(14 - colIndex, rowIndex);
+    let minOffset = Math.min(PATTERN_SIZE - 1 - colIndex, rowIndex);
     // 最大值的偏移量
-    let maxOffset = Math.min(14 - rowIndex, colIndex);
+    let maxOffset = Math.min(PATTERN_SIZE - 1 - rowIndex, colIndex);
     let win = equalColor(
       pattern,
       color,
@@ -152,4 +152,42 @@ export function showChange(pattern, i, j) {
     }
     return;
   }
+}
+export function alertWin(color) {
+  setTimeout(() => {
+    alert(PATTERN_COLOR[color] + " is winner!");
+  });
+}
+
+export function bestChoice(pattern, color, maxLevel) {
+  let p;
+  // 假如要赢，直接返回
+  if ((p = willWin(pattern, color))) {
+    return {
+      point: p,
+      result: 1,
+    };
+  }
+  let result = -2;
+  let point = null;
+
+  outer: for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (pattern[i * 3 + j]) {
+        continue;
+      }
+      let tmp = clone(pattern);
+      tmp[i * 3 + j] = color;
+      // 计算对方的result,确保本方大于对方
+      let r = bestChoice(tmp, 3 - color).result;
+      if (-r > result) {
+        result = -r;
+        point = [i, j];
+      }
+      if (result == 1) {
+        break outer;
+      }
+    }
+  }
+  return { point, result: point ? result : 0 };
 }
