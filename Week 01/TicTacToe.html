@@ -36,7 +36,9 @@
           let cell = document.createElement("div");
           cell.classList.add("cell");
           cell.innerText = { 2: "x", 1: "o" }[pattern[i * 3 + j]] || "";
-          cell.addEventListener("click", () => userMove(i, j));
+          if (!cell.innerText) {
+            cell.addEventListener("click", () => userMove(i, j));
+          }
           board.appendChild(cell);
         }
         board.appendChild(document.createElement("br"));
