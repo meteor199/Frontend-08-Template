@@ -29,6 +29,7 @@
     <div class="green"></div>
     <div class="yellow"></div>
     <div class="red"></div>
+    <button id="next">next</button>
   </body>
   <script>
     function green() {
@@ -60,14 +61,19 @@
         setTimeout(resolve, t);
       });
     }
+    function happen(element, eventName) {
+      return new Promise((resolve, reject) => {
+        element.addEventListener(eventName, resolve, { once: true });
+      });
+    }
     async function go() {
       while (true) {
         green();
-        await sleep(1000);
+        await happen(document.getElementById("next"), "click");
         yellow();
-        await sleep(200);
+        await happen(document.getElementById("next"), "click");
         red();
-        await sleep(1000);
+        await happen(document.getElementById("next"), "click");
       }
     }
     go();
