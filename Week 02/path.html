@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      #container {
+        width: 701px;
+        font-size: 0px;
+      }
+      .cell {
+        display: inline-block;
+        line-height: 7px;
+
+        width: 6px;
+        height: 6px;
+        background-color: gray;
+
+        border-bottom: 1px solid white;
+        border-right: 1px solid white;
+        vertical-align: top;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    操作：<button onclick="localStorage['map']=JSON.stringify(map)">
+      保存障碍信息
+    </button>
+    <button onclick="localStorage['map']='';location.reload()">清空障碍</button>
+    <button onclick="location.reload()">刷新界面</button><br />
+    寻路：
+    <button onclick="bfs(map,start,end)">广度优先搜索</button>
+    <button onclick="aStar(map,start,end)">A* 普通数据结构</button>
+    <button onclick="aStartWithBinaryHeap(map,start,end)">A* 二叉堆</button>
+
+    <script>
+      const container = document.getElementById("container");
+      let map = localStorage["map"]
+        ? JSON.parse(localStorage["map"])
+        : Array(10000).fill(0);
+
+      var start = [0, 0];
+      var end = [50, 60];
+      /* 初始化地图*/
+      function initMap() {
+        let mousedown = false;
+        let clear = false;
+        for (let i = 0; i < 100; i++) {
+          for (let j = 0; j < 100; j++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+
+            if (map[i * 100 + j] == 1) {
+              cell.style.backgroundColor = "black";
+            }
+            // 渲染颜色
+            cell.addEventListener("mousemove", () => {
+              if (mousedown) {
+                if (clear) {
+                  // 是清空时
+                  cell.style.backgroundColor = "gray";
+                  map[i * 100 + j] = 0;
+                } else {
+                  cell.style.backgroundColor = "black";
+                  map[i * 100 + j] = 1;
+                }
+              }
+            });
+            container.appendChild(cell);
+            cell.title = `${i},${j}`;
+
+            // 标记开始点
+            if (start[0] === i && start[1] === j) {
+              cell.style.backgroundColor = "red";
+            } else if (end[0] === i && end[1] === j) {
+              cell.style.backgroundColor = "green";
+            }
+          }
+          container.appendChild(document.createElement("br"));
+        }
+        document.addEventListener("mousedown", (e) => {
+          mousedown = true;
+          // 当点击右键时，表示清空
+          clear = e.which === 3;
+        });
+        document.addEventListener("mouseup", () => (mousedown = false));
+        // 禁止右键菜单
+        document.addEventListener("contextmenu", (e) => e.preventDefault());
+      }
+
+      function sleep(time) {
+        return new Promise((resolve, reject) => setTimeout(resolve, time));
+      }
+
+      /* 广度优先搜索*/
+      async function bfs(map, start, end) {
+        const queue = [start];
+        const cells = document.getElementsByClassName("cell");
+        const table = Object.create(map);
+
+        function insert(i, j, pre) {
+          if (table[i * 100 + j]) {
+            // 已经计算过,或是墙，则不再重新计算，直接退出
+            return;
+          }
+          // 当此点存在时，放入队列
+          if (i >= 0 && i < 100 && j >= 0 && j < 100) {
+            queue.push([i, j]);
+            // 放入前驱节点
+            table[i * 100 + j] = pre;
+          }
+        }
+        while (queue.length) {
+          let [x, y] = queue.shift();
+          //   console.log(x, y);
+          // 找到终点，则退出
+          if (x === end[0] && y === end[1]) {
+            console.log("找到终点");
+            let path = [];
+            // 找到起始节点则退出
+            while (!(x == start[0] && y == start[1])) {
+              path.push([x, y]);
+              [x, y] = table[x * 100 + y];
+              await sleep(30);
+              cells[x * 100 + y].style.backgroundColor = "purple";
+              console.log(x, y, start);
+            }
+            console.log(path);
+            return path;
+          }
+          //   await sleep(1);
+          // 标记颜色
+          cells[x * 100 + y].style.backgroundColor = "lightgreen";
+
+          // 将相邻节点都放入队列中
+          insert(x - 1, y - 1, [x, y]); // 上左
+          insert(x - 1, y, [x, y]); // 上中
+          insert(x - 1, y + 1, [x, y]); // 上右
+
+          insert(x, y - 1, [x, y]); // 中左
+          insert(x, y + 1, [x, y]); // 中右
+
+          insert(x + 1, y - 1, [x, y]); //下左
+          insert(x + 1, y, [x, y]); //下中
+          insert(x + 1, y + 1, [x, y]); //下右
+        }
+
+        return null;
+      }
+
+      /* A Star,默认使用Sorted数据结构 */
+      async function aStar(map, start, end, struct = Sorted) {
+        const queue = new struct([start], (a, b) => distance(a) - distance(b));
+        const cells = document.getElementsByClassName("cell");
+        const table = Object.create(map);
+
+        function insert(i, j, pre) {
+          if (table[i * 100 + j]) {
+            // 已经计算过,或是墙，则不再重新计算，直接退出
+            return;
+          }
+          // 当此点存在时，放入队列
+          if (i >= 0 && i < 100 && j >= 0 && j < 100) {
+            queue.give([i, j]);
+            // 放入前驱节点
+            table[i * 100 + j] = pre;
+          }
+        }
+        /**计算和终点直线距离的平方,使用勾股定理斜边计算方法*/
+        function distance(point) {
+          return (point[0] - end[0]) ** 2 + (point[1] - end[1]) ** 2;
+        }
+        while (queue.length) {
+          let [x, y] = queue.take();
+          //   console.log(x, y);
+          // 找到终点，则退出
+          if (x === end[0] && y === end[1]) {
+            console.log("找到终点");
+            let path = [];
+            // 找到起始节点则退出
+            while (!(x == start[0] && y == start[1])) {
+              path.push([x, y]);
+              [x, y] = table[x * 100 + y];
+              await sleep(30);
+              cells[x * 100 + y].style.backgroundColor = "purple";
+              console.log(x, y, start);
+            }
+            console.log(path);
+            return path;
+          }
+          await sleep(1);
+          // 标记颜色
+          cells[x * 100 + y].style.backgroundColor = "lightgreen";
+
+          // 将相邻节点都放入队列中
+          insert(x - 1, y - 1, [x, y]); // 上左
+          insert(x - 1, y, [x, y]); // 上中
+          insert(x - 1, y + 1, [x, y]); // 上右
+
+          insert(x, y - 1, [x, y]); // 中左
+          insert(x, y + 1, [x, y]); // 中右
+
+          insert(x + 1, y - 1, [x, y]); //下左
+          insert(x + 1, y, [x, y]); //下中
+          insert(x + 1, y + 1, [x, y]); //下右
+        }
+
+        return null;
+      }
+      /*使用二叉堆的AStar */
+      async function aStartWithBinaryHeap(map, start, end) {
+        return aStar(map, start, end, BinaryHeap);
+      }
+      class Sorted {
+        constructor(data, compare) {
+          this.data = data.slice();
+          this.compare = compare || ((a, b) => a - b);
+        }
+        get length() {
+          return this.data.length;
+        }
+        /*每次取最小值*/
+        take() {
+          if (!this.data.length) {
+            return;
+          }
+
+          let min = this.data[0];
+          let minIndex = 0;
+
+          /*先找出最小值*/
+          for (let i = 1; i < this.data.length; i++) {
+            if (this.compare(this.data[i], min) < 0) {
+              min = this.data[i];
+              minIndex = i;
+            }
+          }
+          // 将最小值移到最后，然后删掉，这样数组移动最小
+          this.data[minIndex] = this.data[this.data.length - 1];
+          this.data.pop();
+          return min;
+        }
+        give(v) {
+          this.data.push(v);
+        }
+      }
+      /*最小二叉堆*/
+      class BinaryHeap {
+        constructor(data, compare) {
+          this.data = [];
+          this.compare = compare || ((a, b) => a - b);
+          for (var i = 0; i < data.length; i++) {
+            this.give(data[i]);
+          }
+        }
+        /*向下调整*/
+        #downAdjust(parentIndex) {
+          let tmp = this.data[parentIndex];
+
+          let childIndex = parentIndex * 2 + 1;
+          if (childIndex > this.length) {
+            return;
+          }
+          // 比右孩子大,则交换位置
+          while (childIndex < this.length) {
+            // 如果有右孩子，且右孩子小于左孩子的值，则定位到右孩子
+            if (
+              childIndex + 1 < this.length &&
+              this.compare(this.data[childIndex + 1], this.data[childIndex]) < 0
+            ) {
+              childIndex++;
+            }
+            // 如果父节点小于任何一个孩子的值，直接跳出
+            if (this.compare(tmp, this.data[childIndex]) <= 0) {
+              break;
+            }
+            //无需真正交换，单向赋值即可
+            this.data[parentIndex] = this.data[childIndex];
+            parentIndex = childIndex;
+            childIndex = 2 * childIndex + 1;
+          }
+          this.data[parentIndex] = tmp;
+        }
+        /*向上调整*/
+        #upAdjust(index) {
+          // 父节点位置
+          let parentIndex = Math.floor((index - 1) / 2);
+          let tmp = this.data[index];
+
+          while (
+            index > 0 &&
+            // 比父节点小，则交换位置
+            this.compare(tmp, this.data[parentIndex]) < 0
+          ) {
+            this.data[index] = this.data[parentIndex];
+
+            index = parentIndex;
+            parentIndex = Math.floor((index - 1) / 2);
+          }
+          this.data[index] = tmp;
+        }
+        get length() {
+          return this.data.length;
+        }
+        take() {
+          const first = this.data[0];
+          this.data[0] = this.data[this.data.length - 1];
+          this.data.pop();
+          this.#downAdjust(0);
+          return first;
+        }
+        give(v) {
+          this.data.push(v);
+          this.#upAdjust(this.data.length - 1);
+        }
+      }
+      initMap();
+    </script>
+  </body>
+</html>
