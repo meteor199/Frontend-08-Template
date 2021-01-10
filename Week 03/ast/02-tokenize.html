@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+
+  <script>
+    var regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g;
+    var directory = [
+      "Number",
+      "Whitespace",
+      "LineTerminator",
+      "*",
+      "/",
+      "+",
+      "-",
+    ];
+
+    function* tokenize(source) {
+      var result = null;
+      var lastIndex = 0;
+      while (true) {
+        lastIndex = regexp.lastIndex;
+        result = regexp.exec(source);
+        // 没有匹配到，则直接跳出
+        if (!result) break;
+
+        if (regexp.lastIndex - lastIndex > result[0].length) {
+          // 正则本次匹配的字符串大于 result[0]，说明部分字符未匹配到。所以报错返回
+          throw new Error(`token errror: ${lastIndex} ${result[0]}`);
+        }
+
+        let token = {
+          type: null,
+          value: null,
+        };
+        // 正则表达式结果遍历，使用数组对应的方式找到结果
+        for (var i = 1; i <= directory.length; i++) {
+          if (result[i]) {
+            token.type = directory[i - 1];
+          }
+        }
+        token.value = result[0];
+        yield token;
+      }
+      yield { type: "EOF" };
+    }
+    for (let token of tokenize("1024 + 10 * 25")) {
+      console.log(token);
+    }
+  </script>
+</html>

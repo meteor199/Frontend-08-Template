@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+
+  <script>
+    var regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)(\+)|(\-)/g;
+    var directory = [
+      "Number",
+      "Whitespace",
+      "LineTerminator",
+      "*",
+      "/",
+      "+",
+      "-",
+    ];
+
+    function tokenize(source) {
+      var result = null;
+      while (true) {
+        result = regexp.exec(source);
+        if (!result) break;
+
+        // 正则表达式结果遍历，使用数组对应的方式找到结果
+        for (var i = 1; i <= directory.length; i++) {
+          if (result[i]) {
+            console.log(directory[i - 1]);
+          }
+        }
+        console.log(result);
+      }
+    }
+    tokenize("1024 + 10 * 25");
+  </script>
+</html>
