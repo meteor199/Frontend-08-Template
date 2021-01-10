@@ -10,14 +10,15 @@
     <button onclick="disposeInput()">计算</button>
 
     <div id="button-wrapper">
-      <button>1+2+3</button>
-      <button>1+2+3*8</button>
+      <button>1*(2+3)</button>
+      <button>5*(2+3)</button>
+      <button>2*(3-2*(1+1))+3</button>
       <button>1+2/5+3*8</button>
     </div>
   </body>
 
   <script>
-    var regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g;
+    var regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)|(\()|(\))/g;
     var directory = [
       "Number",
       "Whitespace",
@@ -26,6 +27,8 @@
       "/",
       "+",
       "-",
+      "(",
+      ")",
     ];
 
     /*将字符串进行词法处理*/
@@ -58,25 +61,40 @@
       }
       yield { type: "EOF" };
     }
+
     /*将词法处理的结果，生成ast*/
     function Expression(source) {
       // <Expression>::=<AdditiveExpression><EOF>
-      if (
-        source[0].type === "AdditiveExpression" &&
-        source[1] &&
-        source[1].type === "EOF"
-      ) {
-        // 当包含终结符时，生成Expression节点,并替换最外层的 AdditiveExpression
-        let node = {
-          type: "Expression",
-          children: [source.shift(), source.shift()],
-        };
-        source.unshift(node);
-        return node;
+
+      function bracket(source, startIndex) {
+        for (let i = startIndex; i < source.length; i++) {
+          if (source[i].type === "(") {
+            const rightIndex = bracket(source, i + 1);
+            const deleted = source.splice(i, rightIndex - i + 1);
+            deleted.shift();
+            deleted.pop();
+            source.splice(i, 0, {
+              type: "AdditiveExpression",
+              operator: "+",
+              children: [AdditiveExpression(deleted)],
+            });
+          } else if (source[i].type === ")") {
+            return i;
+          }
+        }
+        return source.length - 1;
       }
-      // 进行加法处理
+
+      bracket(source, 0);
       AdditiveExpression(source);
-      return Expression(source);
+
+      // 当包含终结符时，生成Expression节点,并替换最外层的 AdditiveExpression
+      let node = {
+        type: "Expression",
+        children: [source.shift(), source.shift()],
+      };
+      source.unshift(node);
+      return node;
     }
     function AdditiveExpression(source) {
       // 产生式：<AdditiveExpression>::=<MultiplicativeExpression>
@@ -250,9 +268,12 @@
     }
     /*获取input的表达式，计算并打印结果*/
     function disposeInput() {
-      const source = generateAst(document.getElementById("input").value);
+      const value = document.getElementById("input").value;
+      const source = generateAst(value);
       const ret = calc(source);
-      console.log("结果:" + ret);
+      const evalRet = eval(value);
+      console.log(`ast 计算结果:${ret};\t eval 结果:${evalRet}`);
+      console.log(`相等：${ret === evalRet}`);
     }
     /*当点击按键时，将按键的表达式设置给Input*/
     document.getElementById("button-wrapper").onclick = (e) => {
