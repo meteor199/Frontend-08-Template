@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+  <script>
+    const $ = Symbol("$");
+    class Trie {
+      constructor() {
+        this.root = Object.create(null);
+      }
+      // 插入字符串
+      insert(word) {
+        let node = this.root;
+        for (let c of word) {
+          // 假如不存在，则创建一个 map
+          if (!node[c]) {
+            node[c] = Object.create(null);
+          }
+          // 向下遍历
+          node = node[c];
+        }
+        // 假如没有结尾，则添加结尾
+        if (!($ in node)) {
+          node[$] = 0;
+        }
+        // 记录出现的次数
+        node[$]++;
+      }
+      // 出现最大次数的字符串
+      most() {
+        let max = 0;
+        let maxWord = {};
+
+        const visit = (node, word) => {
+          if ($ in node) {
+            // 假如是终止，则比较一下
+            if (max < node[$]) {
+              // 有更大的字符串，则重置maxWord
+              maxWord = { [word]: true };
+              max = node[$];
+            } else if (max === node[$]) {
+              // 否则，则记录当前字符串
+              maxWord[word] = true;
+            }
+          } else {
+            for (let c in node) {
+              visit(node[c], word + c);
+            }
+          }
+        };
+        visit(this.root, "");
+        console.log(maxWord, max);
+      }
+    }
+
+    /** 构建随机字符串*/
+    function randomWord(length) {
+      return Array(length)
+        .fill(0)
+        .map(() => String.fromCharCode(Math.random() * 26 + "a".charCodeAt(0)))
+        .join("");
+    }
+
+    // 构建10w个字符串的字典树
+    let trie = new Trie();
+    for (let i = 0; i < 10_0000; i++) {
+      trie.insert(randomWord(4));
+    }
+    console.log(trie.root);
+    // 打印最多次数的字符串
+    trie.most();
+  </script>
+</html>

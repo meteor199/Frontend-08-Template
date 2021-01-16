@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+
+  <script>
+    function kmpTable(pattern) {
+      const table = Array(pattern.length).fill(0);
+
+      let i = 1,
+        j = 0;
+      while (i < table.length) {
+        if (pattern[i] == pattern[j]) {
+          ++i, ++j;
+          if (i < table.length) {
+            table[i] = j;
+          }
+        } else {
+          if (j > 0) {
+            // 回退
+            j = table[j];
+          } else {
+            ++i;
+          }
+        }
+      }
+      return table;
+    }
+
+    function kmp(source, pattern) {
+      console.log(source, pattern);
+      if (pattern === "") {
+        return 0;
+      }
+      let i = 0,
+        j = 0;
+      const table = kmpTable(pattern);
+      while (i < source.length) {
+        if (source[i] == pattern[j]) {
+          i++;
+          j++;
+        } else {
+          if (j > 0) {
+            // 回退
+            j = table[j];
+          } else {
+            ++i;
+          }
+        }
+        if (j === pattern.length) {
+          return i - j;
+        }
+      }
+
+      return -1;
+    }
+
+    console.log("abcdabce", kmpTable("abcdabce"));
+    console.log("abcabc", kmpTable("abcabc"));
+    console.log("aabaaac", kmpTable("aabaaac"));
+    console.log("abababc", kmpTable("abababc"));
+    console.log("abababca", kmpTable("abababca"));
+    console.log("abcdabd", kmpTable("abcdabd"));
+    console.log("aaa", kmpTable("aaa"));
+
+    console.log("查找");
+    console.log(kmp("abcdabce", "abce"));
+    console.log(kmp("abcdabce", "ad"));
+  </script>
+</html>
