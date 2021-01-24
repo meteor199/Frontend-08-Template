@@ -6,7 +6,7 @@
 
 # reactivy
 
-自己实现一个简单的 vue3 reactive 库
+实现一个简单的 vue3 reactive 库
 
 # 拖拽
 
