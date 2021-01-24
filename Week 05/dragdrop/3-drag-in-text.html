@@ -47,18 +47,16 @@
 
     let baseX = 0;
     let baseY = 0;
+    // 当按下坐标时，开始处理拖动。
     draggle.addEventListener("mousedown", (event) => {
       const startX = event.clientX;
       const startY = event.clientY;
+      // 当拖动时，将 div插入到里鼠标最近的range中。
       const move = (event) => {
-        console.log(event);
-        // draggle.style.transform = `translate(${
-        //   baseX + event.clientX - startX
-        // }px,${baseY + event.clientY - startY}px)`;
-
         const nearest = getNearest(event.clientX, event.clientY);
         nearest.insertNode(draggle);
       };
+      // 拖动结束时，删除事件。
       const up = (event) => {
         baseX = baseX + event.clientX - startX;
         baseY = baseY + event.clientY - startY;
@@ -73,6 +71,7 @@
 
     const container = document.getElementById("container");
 
+    // 为每个字符生成一个range，并记录下来
     const ranges = [];
     for (let i = 0; i < container.childNodes[0].textContent.length; i++) {
       const range = document.createRange();
@@ -81,7 +80,9 @@
       ranges.push(range);
     }
 
+    /* 获取离指定坐标最近的range,使用勾股定理计算 */
     function getNearest(x, y) {
+      // 使用 Infinity初始化min,这样任何值都比它大
       let min = Infinity;
       let nearest = null;
 

@@ -28,6 +28,8 @@
     }
 
     const reactivites = new WeakMap();
+
+    // 将对象变成响应式对象，基于proxy封装。
     function reactive(obj) {
       if (reactivites.has(obj)) {
         return reactivites.get(obj);
@@ -36,6 +38,7 @@
         set(obj, prop, val) {
           obj[prop] = val;
 
+          // 当对象的值改变时，调用相对应的副作用函数
           if (callbacks.has(obj)) {
             if (callbacks.get(obj).has(prop)) {
               callbacks
@@ -47,9 +50,11 @@
           return obj[prop];
         },
         get(obj, prop) {
+          // 当在effect中调用时，说明需要收集依赖。则在此收集依赖
           if (usedReactivties) {
             usedReactivties.push([obj, prop]);
           }
+          // 当子对象是对象时，也返回一个proxy对象
           if (typeof obj[prop] === "object") {
             return reactive(obj[prop]);
           }
