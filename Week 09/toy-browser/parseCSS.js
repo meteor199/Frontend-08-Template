@@ -58,40 +58,44 @@ function match(element, selector) {
     return false;
   }
 
-  // id 选择器
-  if (selector.charAt(0) == "#") {
-    var attr = element.attributes.find((attr) => attr.name === "id");
-    if (attr && attr.value === selector.replace("#", "")) {
-      return true;
-    }
-  } else if (selector.charAt(0) == ".") {
-    // css 选择器
-    var attr = element.attributes.find((attr) => attr.name === "class");
-    if (attr && attr.value === selector.replace(".", "")) {
-      return true;
-    }
-  } else {
-    // 标签选择器
-    if (element.tagName === selector) {
-      return true;
-    }
+  const selectorIntersection = getSelectorIntersection(selector);
+  var id = (element.attributes.find((attr) => attr.name === "id") || "").value;
+  var classNames = (
+    element.attributes.find((attr) => attr.name === "class") || ""
+  ).value;
+  if (
+    selectorIntersection.tagName &&
+    selectorIntersection.tagName !== element.tagName
+  ) {
+    return false;
   }
-  return false;
+  if (selectorIntersection.id && selectorIntersection.id != id) {
+    return false;
+  }
+
+  if (
+    selectorIntersection.className.length &&
+    !compareArr(selectorIntersection.className, (classNames || "").split(" "))
+  ) {
+    return false;
+  }
+
+  return true;
 }
 function specificity(selector) {
-  var sp = [0, 0, 0, 0];
-
   var selectorParts = selector.split(" ");
+  var sp = [0, 0, 0, 0];
+  for (let part of selectorParts) {
+    const css = getSelectorIntersection(part);
 
-  for (var part of selectorParts) {
-    if (part.charAt(0) == "#") {
-      sp[1] += 1;
-    } else if (part.charAt(0) == ".") {
-      sp[2] += 1;
-    } else {
+    if (css.tagName) {
       sp[3] += 1;
+    } else if (css.id) {
+      sp[1] += 1;
     }
+    sp[2] += css.className.length;
   }
+
   return sp;
 }
 function compare(sp1, sp2) {
@@ -101,4 +105,53 @@ function compare(sp1, sp2) {
     }
   }
   return sp1[3] - sp2[3];
+}
+function getSelectorIntersection(selector) {
+  const ret = {
+    className: [],
+    id: "",
+    tagName: "",
+  };
+  let token = "";
+  let current = "tag";
+  for (const c of selector) {
+    if (c === "#") {
+      emit();
+      current = "id";
+    } else if (c === ".") {
+      emit();
+      current = "class";
+    } else {
+      token += c;
+    }
+  }
+  emit();
+
+  function emit() {
+    if (token) {
+      switch (current) {
+        case "id":
+          ret.id = token;
+          break;
+        case "tag":
+          ret.tagName = token;
+          break;
+        case "class":
+          ret.className.push(token);
+          break;
+      }
+    }
+    token = "";
+  }
+  return ret;
+}
+
+/**arr2包含arr1 */
+function compareArr(arr1, arr2) {
+  for (let item1 of arr1) {
+    if (!arr2.includes(item1)) {
+      return false;
+    }
+  }
+  return true;
 }

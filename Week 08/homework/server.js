@@ -26,12 +26,15 @@ body div img{
   background-color: #ff1111;
 }
 body .btn{
-  color:"red"
+  color:"red";
 }
 body button.btn{
-  color:"blue"
+  color:"blue";
+  height:'1px';
 }
-
+body button.btn.btn1{
+  color:"green";
+}
 </style>
 </head>
 <body>
