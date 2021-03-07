@@ -51,13 +51,13 @@ function computeCSS(element, stack) {
 }
 exports.computeCSS = computeCSS;
 function match(element, selector) {
+    var _a, _b;
     if (!selector || !element.attributes) {
         return false;
     }
     const selectorIntersection = getSelectorIntersection(selector);
-    var id = element.attributes.find((attr) => attr.name === "id")?.value;
-    var classNames = element.attributes.find((attr) => attr.name === "class")
-        ?.value;
+    var id = (_a = element.attributes.find((attr) => attr.name === "id")) === null || _a === void 0 ? void 0 : _a.value;
+    var classNames = (_b = element.attributes.find((attr) => attr.name === "class")) === null || _b === void 0 ? void 0 : _b.value;
     if (selectorIntersection.tagName &&
         selectorIntersection.tagName !== element.tagName) {
         return false;
@@ -143,3 +143,4 @@ function compareArr(arr1, arr2) {
     }
     return true;
 }
+//# sourceMappingURL=parseCSS.js.map

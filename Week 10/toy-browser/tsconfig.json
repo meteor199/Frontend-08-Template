@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "esnext",
+    "target": "es2018",
     "allowJs": true,
+    "sourceMap": true,
     "outDir": "js",
     "lib": ["ES2015"]
   },
