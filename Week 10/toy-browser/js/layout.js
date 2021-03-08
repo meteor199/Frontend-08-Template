@@ -8,6 +8,7 @@ function layout(element) {
     if (elementStyle.display !== 'flex') {
         return;
     }
+    // 设置默认值
     setDefauleValue(elementStyle, 'width', null);
     setDefauleValue(elementStyle, 'height', null);
     setDefauleValue(elementStyle, 'flexDirection', 'row');
@@ -15,14 +16,18 @@ function layout(element) {
     setDefauleValue(elementStyle, 'justifyContent', 'flex-start');
     setDefauleValue(elementStyle, 'flexWrap', 'nowrap');
     setDefauleValue(elementStyle, 'alignContent', 'stretch');
+    // 过滤文本节点等其他节点
     var items = element.children.filter((e) => e.type === 'element');
+    // 先根据order 排序
     items.sort(function (a, b) {
         return (a.style.order || 0) - (b.style.order || 0);
     });
     // 主轴与交叉轴
     var mainAndCross = getMainAndCrossObj(elementStyle);
+    // 父元素没设置主轴尺寸，由子元素撑开
     var isAutoMainSize = calcIsAutoMainSize(mainAndCross, elementStyle, items);
     console.log(isAutoMainSize);
+    /** flex 行 */
     var flexLine = { items: [] };
     var flexLines = [flexLine];
     var mainSpace = elementStyle[mainAndCross.mainSize];
@@ -30,32 +35,41 @@ function layout(element) {
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
         const itemStyle = getStyle(item);
+        // 默认主轴尺寸
         if (itemStyle[mainAndCross.mainSize] === null) {
             itemStyle[mainAndCross.mainSize] = 0;
         }
         if (itemStyle.flex) {
+            // 假如是可伸缩的，一定可以放到当前行
             flexLine.items.push(item);
         }
         else if (elementStyle.flexWrap === 'nowrap' && isAutoMainSize) {
             mainSpace -= itemStyle[mainAndCross.mainSize];
+            // flex布局中，一行有多高，取决于当前行最高元素的高度
             if (itemStyle[mainAndCross.crossSize] !== null && itemStyle[mainAndCross.crossSize] !== void 0) {
                 crossSpace = Math.max(crossSpace, itemStyle[mainAndCross.crossSize]);
             }
             flexLine.items.push(item);
         }
         else {
+            // 换行逻辑
             if (itemStyle[mainAndCross.mainSize] > elementStyle[mainAndCross.mainSize]) {
+                // 假如子元素的宽度比父元素还大，则设置为父元素一样大。
                 itemStyle[mainAndCross.mainSize] = elementStyle[mainAndCross.mainSize];
             }
             if (mainSpace < itemStyle[mainAndCross.mainSize]) {
+                // 主轴空间，不足以容纳剩余元素，则开始换行
                 flexLine.mainSpace = mainSpace;
                 flexLine.crossSpace = crossSpace;
+                // 创建新行
                 flexLine = { items: [item] };
                 flexLines.push(flexLine);
+                // 重置
                 mainSpace = elementStyle[mainAndCross.mainSize];
                 crossSpace = 0;
             }
             else {
+                // 可以放下
                 flexLine.items.push(item);
             }
             if (itemStyle[mainAndCross.crossSize] !== null && itemStyle[mainAndCross.crossSize] !== void 0) {
@@ -73,6 +87,7 @@ function layout(element) {
         flexLine.crossSpace = crossSpace;
     }
     if (mainSpace < 0) {
+        // mainSpace 小于0，则对所有元素做等比压缩
         let scale = elementStyle[mainAndCross.mainSize] / (elementStyle[mainAndCross.mainSize] - mainSpace);
         let currentMain = mainAndCross.mainBase;
         for (let i = 0; i < items.length; i++) {
@@ -85,6 +100,7 @@ function layout(element) {
             itemStyle[mainAndCross.mainStart] = currentMain;
             itemStyle[mainAndCross.mainEnd] =
                 itemStyle[mainAndCross.mainStart] + mainAndCross.mainSign * itemStyle[mainAndCross.mainSize];
+            currentMain = itemStyle[mainAndCross.mainEnd];
         }
     }
     else {
@@ -114,18 +130,16 @@ function layout(element) {
                 }
             }
             else {
-                let currentMain, step;
+                let currentMain = 0;
+                let step = 0;
                 if (elementStyle.justifyContent === 'flex-start') {
                     currentMain = mainAndCross.mainBase;
-                    step = 0;
                 }
                 if (elementStyle.justifyContent === 'flex-end') {
                     currentMain = mainSpace * mainAndCross.mainSign + mainAndCross.mainBase;
-                    step = 0;
                 }
                 if (elementStyle.justifyContent === 'center') {
                     currentMain = (mainSpace / 2) * mainAndCross.mainSign + mainAndCross.mainBase;
-                    step = 0;
                 }
                 if (elementStyle.justifyContent === 'space-between') {
                     step = (mainSpace / (items.items.length - 1)) * mainAndCross.mainSign;
@@ -146,6 +160,7 @@ function layout(element) {
             }
         });
     }
+    // 计算交叉轴
     if (!elementStyle[mainAndCross.crossSize]) {
         crossSpace = 0;
         elementStyle[mainAndCross.crossSize] = 0;
@@ -241,7 +256,7 @@ function calcIsAutoMainSize(obj, elementStyle, items) {
             var item = items[i];
             const itemStyle = item.style;
             if (itemStyle[obj.mainSize] != null || itemStyle[obj.mainSize] !== void 0) {
-                elementStyle[obj.mainSize] = elementStyle[obj.mainSize] + itemStyle[obj.mainSize];
+                elementStyle[obj.mainSize] += itemStyle[obj.mainSize];
             }
         }
         isAutoMainSize = true;
@@ -301,6 +316,7 @@ function getMainAndCrossObj(style) {
         obj.crossStart = 'left';
         obj.crossEnd = 'right';
     }
+    // 交叉轴只受 wrap 影响
     if (style.flexWrap === 'wrap-reverse') {
         var tmp = obj.crossStart;
         obj.crossStart = obj.crossEnd;

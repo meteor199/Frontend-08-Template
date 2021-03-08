@@ -11,6 +11,7 @@ export function layout(element: ToyElement) {
     return;
   }
 
+  // 设置默认值
   setDefauleValue(elementStyle, 'width', null);
   setDefauleValue(elementStyle, 'height', null);
   setDefauleValue(elementStyle, 'flexDirection', 'row');
@@ -18,19 +19,22 @@ export function layout(element: ToyElement) {
   setDefauleValue(elementStyle, 'justifyContent', 'flex-start');
   setDefauleValue(elementStyle, 'flexWrap', 'nowrap');
   setDefauleValue(elementStyle, 'alignContent', 'stretch');
-
+  // 过滤文本节点等其他节点
   var items = element.children.filter((e) => e.type === 'element');
 
+  // 先根据order 排序
   items.sort(function (a, b) {
     return (a.style.order || 0) - (b.style.order || 0);
   });
 
   // 主轴与交叉轴
   var mainAndCross = getMainAndCrossObj(elementStyle);
+  // 父元素没设置主轴尺寸，由子元素撑开
   var isAutoMainSize = calcIsAutoMainSize(mainAndCross, elementStyle, items);
 
   console.log(isAutoMainSize);
 
+  /** flex 行 */
   var flexLine: { items: ToyElement[]; mainSpace?: number; crossSpace?: number } = { items: [] };
   var flexLines = [flexLine];
 
@@ -41,30 +45,41 @@ export function layout(element: ToyElement) {
     const item = items[i];
     const itemStyle = getStyle(item);
 
+    // 默认主轴尺寸
     if (itemStyle[mainAndCross.mainSize] === null) {
       itemStyle[mainAndCross.mainSize] = 0;
     }
 
     if (itemStyle.flex) {
+      // 假如是可伸缩的，一定可以放到当前行
       flexLine.items.push(item);
     } else if (elementStyle.flexWrap === 'nowrap' && isAutoMainSize) {
       mainSpace -= itemStyle[mainAndCross.mainSize];
+      // flex布局中，一行有多高，取决于当前行最高元素的高度
       if (itemStyle[mainAndCross.crossSize] !== null && itemStyle[mainAndCross.crossSize] !== void 0) {
         crossSpace = Math.max(crossSpace, itemStyle[mainAndCross.crossSize]);
       }
       flexLine.items.push(item);
     } else {
+      // 换行逻辑
+
       if (itemStyle[mainAndCross.mainSize] > elementStyle[mainAndCross.mainSize]) {
+        // 假如子元素的宽度比父元素还大，则设置为父元素一样大。
         itemStyle[mainAndCross.mainSize] = elementStyle[mainAndCross.mainSize];
       }
       if (mainSpace < itemStyle[mainAndCross.mainSize]) {
+        // 主轴空间，不足以容纳剩余元素，则开始换行
         flexLine.mainSpace = mainSpace;
         flexLine.crossSpace = crossSpace;
+
+        // 创建新行
         flexLine = { items: [item] };
         flexLines.push(flexLine);
+        // 重置
         mainSpace = elementStyle[mainAndCross.mainSize];
         crossSpace = 0;
       } else {
+        // 可以放下
         flexLine.items.push(item);
       }
 
@@ -85,6 +100,7 @@ export function layout(element: ToyElement) {
   }
 
   if (mainSpace < 0) {
+    // mainSpace 小于0，则对所有元素做等比压缩
     let scale = elementStyle[mainAndCross.mainSize] / (elementStyle[mainAndCross.mainSize] - mainSpace);
     let currentMain = mainAndCross.mainBase;
     for (let i = 0; i < items.length; i++) {
@@ -97,6 +113,7 @@ export function layout(element: ToyElement) {
       itemStyle[mainAndCross.mainStart] = currentMain;
       itemStyle[mainAndCross.mainEnd] =
         itemStyle[mainAndCross.mainStart] + mainAndCross.mainSign * itemStyle[mainAndCross.mainSize];
+      currentMain = itemStyle[mainAndCross.mainEnd];
     }
   } else {
     flexLines.forEach((items) => {
@@ -127,18 +144,16 @@ export function layout(element: ToyElement) {
           currentMain = itemStyle[mainAndCross.mainEnd];
         }
       } else {
-        let currentMain, step;
+        let currentMain = 0;
+        let step = 0;
         if (elementStyle.justifyContent === 'flex-start') {
           currentMain = mainAndCross.mainBase;
-          step = 0;
         }
         if (elementStyle.justifyContent === 'flex-end') {
           currentMain = mainSpace * mainAndCross.mainSign + mainAndCross.mainBase;
-          step = 0;
         }
         if (elementStyle.justifyContent === 'center') {
           currentMain = (mainSpace / 2) * mainAndCross.mainSign + mainAndCross.mainBase;
-          step = 0;
         }
         if (elementStyle.justifyContent === 'space-between') {
           step = (mainSpace / (items.items.length - 1)) * mainAndCross.mainSign;
@@ -162,6 +177,7 @@ export function layout(element: ToyElement) {
     });
   }
 
+  // 计算交叉轴
   if (!elementStyle[mainAndCross.crossSize]) {
     crossSpace = 0;
     elementStyle[mainAndCross.crossSize] = 0;
@@ -264,7 +280,7 @@ function calcIsAutoMainSize(obj: MainAndCross, elementStyle: ToyStyleFinal, item
       const itemStyle = item.style;
 
       if (itemStyle[obj.mainSize] != null || itemStyle[obj.mainSize] !== void 0) {
-        elementStyle[obj.mainSize] = elementStyle[obj.mainSize] + itemStyle[obj.mainSize];
+        elementStyle[obj.mainSize] += itemStyle[obj.mainSize];
       }
     }
     isAutoMainSize = true;
@@ -274,16 +290,16 @@ function calcIsAutoMainSize(obj: MainAndCross, elementStyle: ToyStyleFinal, item
 
 function getMainAndCrossObj(style: ToyStyleFinal) {
   var obj = {
-    mainSize: null as 'width' | 'height',
-    mainStart: null as 'left' | 'right' | 'top' | 'bottom',
-    mainEnd: null as 'left' | 'right' | 'top' | 'bottom',
-    mainSign: null as number,
-    mainBase: null as number,
-    crossSize: null as 'width' | 'height',
-    crossStart: null as 'left' | 'right' | 'top' | 'bottom',
-    crossEnd: null as 'left' | 'right' | 'top' | 'bottom',
-    crossSign: null as number,
-    crossBase: null as number,
+    mainSize: null,
+    mainStart: null,
+    mainEnd: null,
+    mainSign: null,
+    mainBase: null,
+    crossSize: null,
+    crossStart: null,
+    crossEnd: null,
+    crossSign: null,
+    crossBase: null,
   } as MainAndCross;
   if (style.flexDirection === 'row') {
     obj.mainSize = 'width';
@@ -327,6 +343,7 @@ function getMainAndCrossObj(style: ToyStyleFinal) {
     obj.crossEnd = 'right';
   }
 
+  // 交叉轴只受 wrap 影响
   if (style.flexWrap === 'wrap-reverse') {
     var tmp = obj.crossStart;
     obj.crossStart = obj.crossEnd;
