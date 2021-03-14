@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <div id="id" class="class">
+        编写一个 match
+        函数。它接收两个参数，第一个参数是一个选择器字符串性质，第二个是一个
+        HTML 元素。这个元素你可以认为它一定会在一棵 DOM 树里面。通过选择器和 DOM
+        元素来判断，当前的元素是否能够匹配到我们的选择器。（不能使用任何内置的浏览器的函数，仅通过
+        DOM 的 parent 和 children 这些
+        API，来判断一个元素是否能够跟一个选择器相匹配。）以下是一个调用的例子。
+      </div>
+    </div>
+  </body>
+  <script>
+    function match(selector, element) {
+      let ret = false;
+      const cssList = selector.split(/\s+/).map((r) => cssParser(r));
+
+      let currentCss = cssList.pop();
+
+      while (element !== document) {
+        if (matchElement(currentCss, element)) {
+          if (cssList.length === 0) {
+            currentCss = undefined;
+            break;
+          }
+          currentCss = cssList.pop();
+        }
+        element = element.parentNode;
+      }
+
+      ret = !currentCss && cssList.length === 0;
+      console.log(selector, cssList, element, ret);
+      return ret;
+    }
+
+    function matchElement(css, element) {
+      if (css.id && css.id !== element.id) {
+        return false;
+      } else if (css.tagName && css.tagName.toUpperCase() !== element.tagName) {
+        return false;
+      } else if (css.cls.length && !matchArr(css.cls, [...element.classList])) {
+        return false;
+      }
+      return true;
+    }
+
+    function matchArr(arr1, arr2) {
+      arr1.sort();
+      arr2.sort();
+      return JSON.stringify(arr1) === JSON.stringify(arr2);
+    }
+
+    function cssParser(css) {
+      const obj = {
+        cls: [],
+        tagName: "",
+        id: "",
+      };
+
+      let text = "";
+      let current = "tag";
+      for (let c of css) {
+        if (c === "#") {
+          emit();
+          current = "id";
+        } else if (c === ".") {
+          emit();
+          current = "class";
+        } else {
+          text += c;
+        }
+      }
+      emit();
+
+      function emit() {
+        if (!text) {
+          return;
+        }
+
+        if (current === "tag") {
+          obj.tagName = text;
+        } else if (current === "id") {
+          obj.id = text;
+        } else if (current === "class") {
+          obj.cls.push(text);
+        }
+        text = "";
+      }
+
+      return obj;
+    }
+
+    match("div #id.class", document.getElementById("id"));
+    match("htmlc div #id.class", document.getElementById("id"));
+    // match("div > #id.class", document.getElementById("id"));
+  </script>
+</html>
