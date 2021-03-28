@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+  <script>
+    let names = Object.getOwnPropertyNames(window);
+
+    function filterOut(msg, callback) {
+      let objects = [];
+      names = names.filter((e) => {
+        try {
+          if (callback(e)) {
+            objects.push(e);
+            return false;
+          }
+          return true;
+        } catch (err) {
+          return true;
+        }
+      });
+      console.log(msg, objects);
+    }
+    function filterOutArr(msg, arr) {
+      filterOut(msg, (e) => arr.includes(e));
+    }
+
+    // ECMA 262
+    {
+      // https://262.ecma-international.org/6.0/
+      let js = new Set();
+      let objects = [
+        "console",
+        "AggregateError",
+        "Array",
+        "ArrayBuffer",
+        "AsyncFunction",
+        "Atomics",
+        "BigInt",
+        "BigInt64Array",
+        "BigUint64Array",
+        "Boolean",
+        "DataView",
+        "Date",
+        "decodeURI",
+        "decodeURIComponent",
+        "encodeURI",
+        "encodeURIComponent",
+        "Error",
+        "escape",
+        "eval",
+        "EvalError",
+        "FinalizationRegistry",
+        "Float32Array",
+        "Float64Array",
+        "Function",
+        "Generator",
+        "GeneratorFunction",
+        "globalThis",
+        "Infinity",
+        "Int16Array",
+        "Int32Array",
+        "Int8Array",
+        "InternalError",
+        "Intl",
+        "isFinite",
+        "isNaN",
+        "JSON",
+        "Map",
+        "Math",
+        "NaN",
+        "null",
+        "Number",
+        "Object",
+        "parseFloat",
+        "parseInt",
+        "Promise",
+        "Proxy",
+        "RangeError",
+        "ReferenceError",
+        "Reflect",
+        "RegExp",
+        "Set",
+        "SharedArrayBuffer",
+        "String",
+        "Symbol",
+        "SyntaxError",
+        "TypedArray",
+        "TypeError",
+        "Uint16Array",
+        "Uint32Array",
+        "Uint8Array",
+        "Uint8ClampedArray",
+        "undefined",
+        "unescape",
+        "uneval",
+        "URIError",
+        "WeakMap",
+        "WeakRef",
+        "WeakSet",
+        "WebAssembly",
+      ];
+      objects.forEach((o) => js.add(o));
+
+      filterOut("ECMA 262", (e) => js.has(e));
+    }
+
+    // ✔ CSSOM
+    {
+      // https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model
+      const objects = [
+        "AnimationEvent",
+        "CaretPosition",
+        "CSS",
+        "CSSCharsetRule",
+        "CSSConditionRule",
+        "CSSCounterStyleRule",
+        "CSSFontFaceRule",
+        "CSSFontFeatureValuesMap",
+        "CSSFontFeatureValuesRule",
+        "CSSGroupingRule",
+        "CSSImportRule",
+        "CSSKeyframeRule",
+        "CSSKeyframesRule",
+        "CSSMarginRule",
+        "CSSMediaRule",
+        "CSSNamespaceRule",
+        "CSSPageRule",
+        "CSSRule",
+        "CSSRuleList",
+        "CSSStyleDeclaration",
+        "CSSStyleSheet",
+        "CSSStyleRule",
+        "CSSSupportsRule",
+        "CSSVariablesMap",
+        "CSSViewportRule",
+        "ElementCSSInlineStyle",
+        "FontFace",
+        "FontFaceSet",
+        "FontFaceSetLoadEvent",
+        "GeometryUtils",
+        "GetStyleUtils",
+        "LinkStyle",
+        "MediaList",
+        "MediaQueryList",
+        "MediaQueryListEvent",
+        "Screen",
+        "StyleSheet",
+        "StyleSheetList",
+        "TransitionEvent",
+        "CSSImageValue",
+        "CSSKeywordValue",
+        "CSSMathInvert",
+        "CSSMathMax",
+        "CSSMathMin",
+        "CSSMathNegate",
+        "CSSMathProduct",
+        "CSSMathSum",
+        "CSSMathValue",
+        "CSSMatrixComponent",
+        "CSSNumericArray",
+        "CSSNumericValue",
+        "CSSPerspective",
+        "CSSPositionValue",
+        "CSSRotate",
+        "CSSScale",
+        "CSSSkew",
+        "CSSSkewX",
+        "CSSSkewY",
+        "CSSStyleValue",
+        "CSSTransformComponent",
+        "CSSTransformValue",
+        "CSSTranslate",
+        "CSSUnitValue",
+        "CSSUnparsedValue",
+        "CSSVariableReferenceValue",
+        "StylePropertyMap",
+        "StylePropertyMapReadOnly",
+      ];
+      filterOutArr("cssom", objects);
+    }
+
+    // ✔ Navigation Timing API
+
+    {
+      // https://url.spec.whatwg.org/
+      // https://developer.mozilla.org/en-US/docs/Web/API/URL_API
+      const objects = [
+        "Performance",
+        "PerformanceNavigation",
+        "PerformanceTiming",
+        "PerformanceNavigationTiming",
+        "performance",
+      ];
+      filterOutArr("Navigation Timing API", objects);
+    }
+
+    // ✔ whatwg URL
+    {
+      // https://url.spec.whatwg.org/
+      // https://developer.mozilla.org/en-US/docs/Web/API/URL_API
+      const objects = ["URL", "URLSearchParams"];
+      filterOutArr("whatwg url", objects);
+    }
+    // ✔ whatwg Compatibility
+    {
+      // https://compat.spec.whatwg.org/
+      const objects = ["orientation", "WebKitCSSMatrix"];
+      filterOutArr("whatwg Compatibility", objects);
+    }
+    // ✔ whatwg console
+    {
+      // https://console.spec.whatwg.org/
+      const objects = ["console"];
+      filterOutArr("whatwg console", objects);
+    }
+    // ✔ whatwg dom interface
+    {
+      // https://dom.spec.whatwg.org/
+      const objects = [
+        "Attr",
+        "CDATASection",
+        "CharacterData",
+        "ChildNode ",
+        "Comment",
+        "CustomEvent",
+        "Document",
+        "DocumentFragment",
+        "DocumentType",
+        "DOMError ",
+        "DOMException",
+        "DOMImplementation",
+        "DOMString",
+        "DOMTimeStamp",
+        "DOMStringList",
+        "DOMTokenList",
+        "Element",
+        "Event",
+        "EventTarget",
+        "HTMLCollection",
+        "MutationObserver",
+        "MutationRecord",
+        "NamedNodeMap",
+        "Node",
+        "NodeFilter",
+        "NodeIterator",
+        "NodeList",
+        "ParentNode",
+        "ProcessingInstruction",
+        "Selection ",
+        "Range",
+        "Text",
+        "TextDecoder ",
+        "TextEncoder ",
+        "TimeRanges",
+        "TreeWalker",
+        "URL",
+        "Window",
+        "Worker",
+        "XMLDocument ",
+      ];
+      filterOutArr("whatwg dom interface", objects);
+    }
+
+    // ✔ whatwg dom obsolete interface
+    {
+      // https://dom.spec.whatwg.org/
+      const objects = [
+        "DocumentTouch",
+        "DOMConfiguration",
+        "DOMErrorHandler",
+        "DOMImplementationList",
+        "DOMImplementationRegistry",
+        "DOMImplementationSource",
+        "DOMLocator",
+        "DOMObject",
+        "DOMSettableTokenList",
+        "DOMUserData",
+        "ElementTraversal",
+        "Entity",
+        "EntityReference",
+        "NameList",
+        "Notation",
+        "TypeInfo",
+        "UserDataHandler",
+      ];
+      filterOutArr("whatwg obsolete dom interface", objects);
+    }
+
+    // ✔ whatwg dom SMIL-related interfaces
+    {
+      // https://dom.spec.whatwg.org/
+      const objects = ["ElementTimeControl", "TimeEvent"];
+      filterOutArr("whatwg dom SMIL-related interfaces", objects);
+    }
+
+    // ✔ whatwg dom svg
+    {
+      // https://dom.spec.whatwg.org/
+      const objects = [
+        "SVGAElement",
+        "SVGAltGlyphElement ",
+        "SVGAltGlyphDefElement ",
+        "SVGAltGlyphItemElement ",
+        "SVGAnimationElement",
+        "SVGAnimateElement",
+        "SVGAnimateColorElement ",
+        "SVGAnimateMotionElement",
+        "SVGAnimateTransformElement",
+        "SVGCircleElement",
+        "SVGClipPathElement",
+        "SVGColorProfileElement ",
+        "SVGComponentTransferFunctionElement",
+        "SVGCursorElement",
+        "SVGDefsElement",
+        "SVGDescElement",
+        "SVGElement",
+        "SVGEllipseElement",
+        "SVGFEBlendElement",
+        "SVGFEColorMatrixElement",
+        "SVGFEComponentTransferElement",
+        "SVGFECompositeElement",
+        "SVGFEConvolveMatrixElement",
+        "SVGFEDiffuseLightingElement",
+        "SVGFEDisplacementMapElement",
+        "SVGFEDistantLightElement",
+        "SVGFEDropShadowElement",
+        "SVGFEFloodElement",
+        "SVGFEFuncAElement",
+        "SVGFEFuncBElement",
+        "SVGFEFuncGElement",
+        "SVGFEFuncRElement",
+        "SVGFEGaussianBlurElement",
+        "SVGFEImageElement",
+        "SVGFEMergeElement",
+        "SVGFEMergeNodeElement",
+        "SVGFEMorphologyElement",
+        "SVGFEOffsetElement",
+        "SVGFEPointLightElement",
+        "SVGFESpecularLightingElement",
+        "SVGFESpotLightElement",
+        "SVGFETileElement",
+        "SVGFETurbulenceElement",
+        "SVGFilterElement",
+        "SVGFilterPrimitiveStandardAttributes",
+        "SVGFontElement ",
+        "SVGFontFaceElement ",
+        "SVGFontFaceFormatElement ",
+        "SVGFontFaceNameElement ",
+        "SVGFontFaceSrcElement ",
+        "SVGFontFaceUriElement ",
+        "SVGForeignObjectElement",
+        "SVGGElement",
+        "SVGGeometryElement",
+        "SVGGlyphElement ",
+        "SVGGlyphRefElement ",
+        "SVGGradientElement",
+        "SVGGraphicsElement",
+        "SVGHatchElement ",
+        "SVGHatchpathElement ",
+        "SVGHKernElement ",
+        "SVGImageElement",
+        "SVGLinearGradientElement",
+        "SVGLineElement",
+        "SVGMarkerElement ",
+        "SVGMaskElement",
+        "SVGMeshElement ",
+        "SVGMeshGradientElement ",
+        "SVGMeshpatchElement ",
+        "SVGMeshrowElement ",
+        "SVGMetadataElement",
+        "SVGMissingGlyphElement ",
+        "SVGMPathElement",
+        "SVGPathElement",
+        "SVGPatternElement",
+        "SVGPolylineElement",
+        "SVGPolygonElement",
+        "SVGRadialGradientElement",
+        "SVGRectElement",
+        "SVGScriptElement",
+        "SVGSetElement",
+        "SVGSolidcolorElement ",
+        "SVGStopElement",
+        "SVGStyleElement",
+        "SVGSVGElement",
+        "SVGSwitchElement",
+        "SVGSymbolElement",
+        "SVGTextContentElement",
+        "SVGTextElement",
+        "SVGTextPathElement",
+        "SVGTextPositioningElement",
+        "SVGTitleElement",
+        "SVGTRefElement ",
+        "SVGTSpanElement",
+        "SVGUseElement",
+        "SVGUnknownElement ",
+        "SVGViewElement",
+        "SVGVKernElement ",
+        "SVGAngle",
+        "SVGColor ",
+        "SVGICCColor ",
+        "SVGElementInstance",
+        "SVGElementInstanceList",
+        "SVGLength",
+        "SVGLengthList",
+        "SVGMatrix ",
+        "SVGNameList",
+        "SVGNumber",
+        "SVGNumberList",
+        "SVGPaint",
+        "SVGPathSeg ",
+        "SVGPathSegClosePath ",
+        "SVGPathSegMovetoAbs ",
+        "SVGPathSegMovetoRel ",
+        "SVGPathSegLinetoAbs ",
+        "SVGPathSegLinetoRel ",
+        "SVGPathSegCurvetoCubicAbs ",
+        "SVGPathSegCurvetoCubicRel ",
+        "SVGPathSegCurvetoQuadraticAbs ",
+        "SVGPathSegCurvetoQuadraticRel ",
+        "SVGPathSegArcAbs ",
+        "SVGPathSegArcRel ",
+        "SVGPathSegLinetoHorizontalAbs ",
+        "SVGPathSegLinetoHorizontalRel ",
+        "SVGPathSegLinetoVerticalAbs ",
+        "SVGPathSegLinetoVerticalRel ",
+        "SVGPathSegCurvetoCubicSmoothAbs ",
+        "SVGPathSegCurvetoCubicSmoothRel ",
+        "SVGPathSegCurvetoQuadraticSmoothAbs ",
+        "SVGPathSegCurvetoQuadraticSmoothRel ",
+        "SVGPathSegList ",
+        "SVGPoint ",
+        "SVGPointList ",
+        "SVGPreserveAspectRatio",
+        "SVGRect ",
+        "SVGStringList",
+        "SVGTransform",
+        "SVGTransformList",
+        "SVGAnimatedAngle",
+        "SVGAnimatedBoolean",
+        "SVGAnimatedEnumeration",
+        "SVGAnimatedInteger",
+        "SVGAnimatedLength",
+        "SVGAnimatedLengthList",
+        "SVGAnimatedNumber",
+        "SVGAnimatedNumberList",
+        "SVGAnimatedPathData ",
+        "SVGAnimatedPoints",
+        "SVGAnimatedPreserveAspectRatio",
+        "SVGAnimatedRect",
+        "SVGAnimatedString",
+        "SVGAnimatedTransformList",
+        "GetSVGDocument",
+        "ShadowAnimation",
+        "SVGColorProfileRule ",
+        "SVGCSSRule ",
+        "SVGDocument",
+        "SVGException ",
+        "SVGExternalResourcesRequired ",
+        "SVGFitToViewBox",
+        "SVGLangSpace ",
+        "SVGLocatable ",
+        "SVGRenderingIntent ",
+        "SVGStylable ",
+        "SVGTests",
+        "SVGTransformable ",
+        "SVGUnitTypes",
+        "SVGUseElementShadowRoot",
+        "SVGURIReference",
+        "SVGViewSpec ",
+        "SVGZoomAndPan",
+        "SVGZoomEvent ",
+      ];
+      filterOutArr("whatwg dom svg ", objects);
+    }
+
+    // ✔ whatwg  Notification
+    {
+      // https://notifications.spec.whatwg.org/
+      const objects = [
+        "Notification",
+        "ServiceWorkerRegistration",
+        "ServiceWorkerGlobalScope",
+        "NotificationEvent",
+      ];
+      filterOutArr("whatwg Notification", objects);
+    }
+    // ✔ whatwg storage
+    {
+      // https://storage.spec.whatwg.org/
+      const objects = [
+        "caches",
+        "indexedDB",
+        "localStorage",
+        "serviceWorkerRegistrations",
+        "sessionStorage",
+      ];
+      filterOutArr("whatwg storage", objects);
+    }
+
+    // ✔ whatwg XMLHttpRequest
+    {
+      // https://xhr.spec.whatwg.org/
+      const objects = [
+        "FormData",
+        "XMLHttpRequest",
+        "XMLHttpRequestEventTarget",
+        "XMLHttpRequestUpload",
+      ];
+      filterOutArr("whatwg XMLHttpRequest", objects);
+    }
+
+    // ✔ whatwg fetch
+    {
+      // https://fetch.spec.whatwg.org/
+      const objects = ["fetch", "Body", "Headers", "Request"];
+      filterOutArr("whatwg fetch", objects);
+    }
+    // ✔ whatwg fullscreen
+    {
+      // https://fullscreen.spec.whatwg.org/
+      const objects = [
+        "Document.exitFullscreen()",
+        "Element.requestFullscreen()",
+        "Document.fullscreenElement / ShadowRoot.fullscreenElement",
+        "document.fullscreenEnabled",
+        "Document.onfullscreenchange",
+        "Document.onfullscreenerror",
+        "Element.onfullscreenchange",
+        "Element.onfullscreenerror",
+        "Document.fullscreen",
+      ];
+      console.log("whatwg fullscreen", objects);
+    }
+    // ✔ whatwg dom
+    {
+      // https://dom.spec.whatwg.org/
+      const objects = [
+        "undefined",
+        "SyntaxError",
+        "TypeError",
+        "XPathResult",
+        "XPathExpression",
+        "XPathEvaluator",
+        "UIEvent",
+        "TreeWalker",
+        "TouchEvent",
+        "StaticRange",
+        "Range",
+        "NodeList",
+        "NodeIterator",
+        "NodeFilter",
+        "Node",
+        "NamedNodeMap",
+        "MutationRecord",
+        "MutationObserver",
+        "MutationEvent",
+        "MouseEvent",
+        "KeyboardEvent",
+        "HTMLCollection",
+        "FocusEvent",
+        "EventTarget",
+        "Event",
+        "DOMTokenList",
+        "DOMImplementation",
+        "DOMException",
+        "DOMError",
+        "CustomEvent",
+        "CompositionEvent",
+        "AbortSignal",
+        "AbortController",
+        "event",
+        "DeviceMotionEvent",
+        "DeviceOrientationEvent",
+      ];
+      filterOutArr("whatwg dom", objects);
+    }
+
+    // ✔ subclass of Node
+    {
+      filterOut("Subclass of Node", (e) => window[e].prototype instanceof Node);
+    }
+    // ✔ events
+    {
+      filterOut("events", (e) => e.match(/^on/));
+    }
+    // ✔ webkit private
+    {
+      filterOut("webkit private", (e) => e.match(/^webkit/));
+    }
+
+    // ✔ whatwg html
+    {
+      // https://html.spec.whatwg.org/multipage/
+      const objects = [
+        "self",
+        "document",
+        "name",
+        "location",
+        "history",
+        "customElements",
+        "locationbar",
+        "menubar",
+        "personalbar",
+        "scrollbars",
+        "statusbar",
+        "toolbar",
+        "status",
+        "close",
+        "closed",
+        "stop",
+        "focus",
+        "blur",
+        "frames",
+        "length",
+        "top",
+        "opener",
+        "parent",
+        "frameElement",
+        "open",
+        "navigator",
+        "originAgentCluster",
+        "alert",
+        "confirm",
+        "prompt",
+        "print",
+        "postMessage",
+      ];
+
+      filterOutArr("whatwg html api", objects);
+      const objects1 = [
+        "Worker",
+        "Window",
+        "WebSocket",
+        "TrackEvent",
+        "SubmitEvent",
+        "StorageEvent",
+        "Storage",
+        "PopStateEvent",
+        "Path2D",
+        "PageTransitionEvent",
+        "Navigator",
+        "MessageEvent",
+        "Location",
+        "ImageBitmapRenderingContext",
+        "ImageBitmap",
+        "History",
+        "HashChangeEvent",
+        "HTMLOptionsCollection",
+        "HTMLFormControlsCollection",
+        "HTMLAllCollection",
+        "FormDataEvent",
+        "EventSource",
+        "ElementInternals",
+        "DragEvent",
+        "DataTransferItemList",
+        "DataTransferItem",
+        "DataTransfer",
+        "DOMStringList",
+        "CustomElementRegistry",
+        "CloseEvent",
+        "BeforeUnloadEvent",
+        "external",
+        "sessionStorage",
+        "localStorage",
+        "Worklet",
+        "OffscreenCanvas",
+        "SharedWorker",
+      ];
+      filterOutArr("whatwg html api 1", objects1);
+    }
+
+    // ✔ ecma 402
+    {
+      // https://402.ecma-international.org/7.0/#intl-object
+      filterOut("ecma 402", (e) => "Intl" === e);
+    }
+    // ✔ textencoder
+    {
+      const objects = [
+        "TextDecoder",
+        "TextEncoder",
+        "TextDecoderStream",
+        "TextEncoderStream",
+      ];
+
+      //https://encoding.spec.whatwg.org/
+      //https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API
+      filterOutArr("Encoding API", objects);
+    }
+    // ✔ streams
+    {
+      //https://streams.spec.whatwg.org/
+      //https://developer.mozilla.org/en-US/docs/Web/API/Streams_API
+      const objects = [
+        "WritableStreamDefaultWriter",
+        "WritableStream",
+        "Request",
+        "ReadableStreamDefaultReader",
+        "ReadableStreamDefaultController",
+        "ReadableStream",
+        "CountQueuingStrategy",
+        "ByteLengthQueuingStrategy",
+        "ReadableByteStreamController",
+        "ReadableStreamBYOBReader",
+        "ReadableStreamBYOBRequest",
+      ];
+      filterOutArr("streams", objects);
+    }
+
+    // ✔ webgl
+    {
+      // https://www.khronos.org/registry/webgl/specs/latest/2.0/
+      // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
+      // copy([...document.querySelectorAll('.index a code')].map(r=>r.innerText))
+      const objects = [
+        "WebGLRenderingContext",
+        "WebGL2RenderingContext",
+        "WebGLActiveInfo",
+        "WebGLBuffer",
+        "WebGLContextEvent",
+        "WebGLFramebuffer",
+        "WebGLProgram",
+        "WebGLQuery",
+        "WebGLRenderbuffer",
+        "WebGLSampler",
+        "WebGLShader",
+        "WebGLShaderPrecisionFormat",
+        "WebGLSync",
+        "WebGLTexture",
+        "WebGLTransformFeedback",
+        "WebGLUniformLocation",
+        "WebGLVertexArrayObject",
+      ];
+      filterOutArr("webgl", objects);
+    }
+    // ✔ webaudio
+    {
+      // https://www.w3.org/TR/webaudio
+      // https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Audio_API
+      // [...document.querySelectorAll('a code')].map(r=>r.innerText)
+      const objects = [
+        "OscillatorNode",
+        "AudioBufferSourceNode",
+        "MediaElementAudioSourceNode",
+        "MediaStreamAudioSourceNode",
+        "GainNode",
+        "AudioContext.destination",
+        "AudioContext",
+        "AudioNode",
+        "BiquadFilterNode",
+        "GainNode",
+        "AudioParam",
+        "AudioNode",
+        "OscillatorNode",
+        "AudioNode",
+        "AudioBuffer",
+        "AudioContext.decodeAudioData()",
+        "AudioContext.createBuffer()",
+        "AudioBufferSourceNode",
+        "AudioBufferSourceNode",
+        "AudioBuffer",
+        "AudioNode",
+        "MediaElementAudioSourceNode",
+        "AudioNode",
+        "MediaStreamAudioSourceNode",
+        "MediaStream",
+        "AudioNode",
+        "BiquadFilterNode",
+        "AudioNode",
+        "ConvolverNode",
+        "AudioNode",
+        "DelayNode",
+        "AudioNode",
+        "DynamicsCompressorNode",
+        "GainNode",
+        "AudioNode",
+        "StereoPannerNode",
+        "WaveShaperNode",
+        "AudioNode",
+        "PeriodicWave",
+        "OscillatorNode",
+        "AudioDestinationNode",
+        "MediaStreamAudioDestinationNode",
+        "MediaStream",
+        "getUserMedia()",
+        "MediaStream",
+        "AudioNode",
+        "AnalyserNode",
+        "ChannelSplitterNode",
+        "ChannelMergerNode",
+        "AudioListener",
+        "PannerNode",
+        "AudioNode",
+        "ScriptProcessorNode",
+        "AudioNode",
+        "AudioProcessingEvent",
+        "ScriptProcessorNode",
+        "AudioProcessingEvent",
+        "ScriptProcessorNode",
+        "AudioBuffer",
+        "OfflineAudioContext",
+        "AudioContext",
+        "AudioNode",
+        "OfflineAudioCompletionEvent",
+        "ScriptProcessorNode",
+        "AudioWorkerNode",
+        "AudioNode",
+        "AudioWorkerGlobalScope",
+        "AudioProcessEvent",
+        "AudioWorkerGlobalScope",
+        "JavaScriptNode",
+        "ScriptProcessorNode",
+        "WaveTableNode",
+        "PeriodicWave",
+        "AnalyserNode",
+        "AudioBuffer",
+        "AudioBufferSourceNode",
+        "AudioContext",
+        "AudioDestinationNode",
+        "AudioListener",
+        "AudioNode",
+        "AudioParam",
+        "AudioProcessingEvent",
+        "BiquadFilterNode",
+        "ChannelMergerNode",
+        "ChannelSplitterNode",
+        "ConvolverNode",
+        "DelayNode",
+        "DynamicsCompressorNode",
+        "GainNode",
+        "MediaElementAudioSourceNode",
+        "MediaStreamAudioDestinationNode",
+        "MediaStreamAudioSourceNode",
+        "OfflineAudioCompletionEvent",
+        "OfflineAudioContext",
+        "OscillatorNode",
+        "PannerNode",
+        "PeriodicWaveNode",
+        "ScriptProcessorNode",
+        "WaveShaperNode",
+      ];
+      filterOutArr("webaudio", objects);
+    }
+    // ✔ webrtc
+    {
+      // https://w3c.github.io/webrtc-pc/#dom-rtccertificate
+      // https://w3c.github.io/webrtc-pc/#dom-rtccertificate
+      const objects = [
+        "RTCTrackEvent",
+        "RTCStatsReport",
+        "RTCSessionDescription",
+        "RTCSctpTransport",
+        "RTCRtpTransceiver",
+        "RTCRtpSender",
+        "RTCRtpReceiver",
+        "RTCPeerConnectionIceEvent",
+        "RTCPeerConnectionIceErrorEvent",
+        "RTCPeerConnection",
+        "RTCIceCandidate",
+        "RTCErrorEvent",
+        "RTCDtlsTransport",
+        "RTCDataChannelEvent",
+        "RTCDataChannel",
+        "RTCDTMFToneChangeEvent",
+        "RTCDTMFSender",
+        "RTCCertificate",
+        "MediaStreamTrack",
+        "MediaStreamEvent",
+        "MediaDevices",
+        "RTCIceTransport",
+      ];
+      filterOutArr("webrtc", objects);
+    }
+
+    // ✔ wicg
+    {
+      //https://wicg.github.io/background-sync/spec/#sync-manager-interface
+      filterOutArr("wicg", ["SyncManager"]);
+    }
+    console.log(names);
+  </script>
+</html>
