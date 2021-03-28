@@ -180,6 +180,8 @@
         "CSSVariableReferenceValue",
         "StylePropertyMap",
         "StylePropertyMapReadOnly",
+        "CSSPropertyRule",
+        "CSSAnimation",
       ];
       filterOutArr("cssom", objects);
     }
@@ -501,6 +503,34 @@
       ];
       filterOutArr("whatwg storage", objects);
     }
+    // ✔ whatwg indexedDB
+    {
+      // https://storage.spec.whatwg.org/
+      const objects = [
+        "IDBCursor",
+        "IDBCursorSync",
+        "IDBCursorWithValue",
+        "IDBDatabase",
+        "IDBDatabaseException",
+        "IDBDatabaseSync",
+        "IDBEnvironment",
+        "IDBEnvironmentSync",
+        "IDBFactory",
+        "IDBFactorySync",
+        "IDBIndex",
+        "IDBIndexSync",
+        "IDBKeyRange",
+        "IDBObjectStore",
+        "IDBObjectStoreSync",
+        "IDBOpenDBRequest",
+        "IDBRequest",
+        "IDBTransaction",
+        "IDBTransactionSync",
+        "IDBVersionChangeEvent",
+        "IDBVersionChangeRequest",
+      ];
+      filterOutArr("whatwg indexedDB", objects);
+    }
 
     // ✔ whatwg XMLHttpRequest
     {
@@ -576,6 +606,27 @@
         "event",
         "DeviceMotionEvent",
         "DeviceOrientationEvent",
+        "DOMError",
+        "DOMException",
+        "DOMHighResTimeStamp",
+        "DOMImplementation",
+        "DOMLocator",
+        "DOMMatrix",
+        "DOMMatrixReadOnly",
+        "DOMObject",
+        "DOMParser",
+        "DOMPoint",
+        "DOMPointInit",
+        "DOMPointReadOnly",
+        "DOMQuad",
+        "DOMRect",
+        "DOMRectReadOnly",
+        "DOMString",
+        "DOMStringList",
+        "DOMStringMap",
+        "DOMTimeStamp",
+        "DOMTokenList",
+        "DOMUserData",
       ];
       filterOutArr("whatwg dom", objects);
     }
