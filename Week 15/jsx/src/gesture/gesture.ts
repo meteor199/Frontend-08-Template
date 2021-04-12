@@ -96,6 +96,9 @@ export class Listener {
   }
 }
 
+/**
+ * 处理拖动
+ */
 export class Recognizer {
   constructor(private dispatcher: Dispatcher) {}
 
@@ -235,6 +238,6 @@ interface IContext {
   isVertical: boolean;
 }
 
-export function enableGesture(element) {
+export function enableGesture(element: Element) {
   new Listener(element, new Recognizer(new Dispatcher(element)));
 }
