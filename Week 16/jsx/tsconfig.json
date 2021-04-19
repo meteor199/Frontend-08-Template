@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "jsx": "preserve",
+    "jsxFactory": "createElement"
+  },
+  "include": ["src/**/*.ts", "src/carousel/main.tsx"],
+  "exclude": ["node_modules"]
+}
