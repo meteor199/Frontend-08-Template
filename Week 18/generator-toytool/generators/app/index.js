@@ -53,24 +53,59 @@ module.exports = class extends Generator {
     );
 
     this.fs.copyTpl(
-      this.templatePath("HelloWorld.vue"),
+      this.templatePath("src/HelloWorld.vue"),
       this.destinationPath("src/HelloWorld.vue"),
       {}
     );
+    this.fs.copyTpl(
+      this.templatePath("src/types/modules.d.ts"),
+      this.destinationPath("src/types/modules.d.ts"),
+      {}
+    );
+    this.fs.copyTpl(
+      this.templatePath("src/main.ts"),
+      this.destinationPath("src/main.ts"),
+      {}
+    );
+    this.fs.copyTpl(
+      this.templatePath("src/index.html"),
+      this.destinationPath("src/index.html"),
+      { title: answers.name }
+    );
+
+    this.fs.copyTpl(
+      this.templatePath("test/babel-register.js"),
+      this.destinationPath("test/babel-register.js")
+    );
+    this.fs.copyTpl(
+      this.templatePath("test/test-sample.spec.ts"),
+      this.destinationPath("test/test-sample.spec.ts")
+    );
+
     this.fs.copyTpl(
       this.templatePath("webpack.config.js"),
       this.destinationPath("webpack.config.js"),
       {}
     );
     this.fs.copyTpl(
-      this.templatePath("main.js"),
-      this.destinationPath("src/main.js"),
+      this.templatePath(".gitignore"),
+      this.destinationPath(".gitignore"),
       {}
     );
     this.fs.copyTpl(
-      this.templatePath("index.html"),
-      this.destinationPath("src/index.html"),
-      { title: answers.name }
+      this.templatePath(".mocharc.json"),
+      this.destinationPath(".mocharc.json"),
+      {}
+    );
+    this.fs.copyTpl(
+      this.templatePath(".nycrc"),
+      this.destinationPath(".nycrc"),
+      {}
+    );
+    this.fs.copyTpl(
+      this.templatePath("tsconfig.json"),
+      this.destinationPath("tsconfig.json"),
+      {}
     );
   }
 };

@@ -4,9 +4,9 @@
   "main": "generators/app/index.js",
   "license": "MIT",
   "scripts": {
-    "webpack": "webpack",
     "test": "mocha",
-    "coverage": "nyc mocha"
+    "coverage": "nyc mocha",
+    "webpack": "webpack"
   },
   "devDependencies": {
     "@babel/core": "^7.14.0",
