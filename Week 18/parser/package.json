@@ -1,0 +1,27 @@
+{
+  "name": "example-typescript-babel-combination",
+  "version": "1.0.0",
+  "description": "TypeScript-Babel Combination",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "test": "mocha",
+    "coverage": "nyc mocha"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.0",
+    "@babel/preset-env": "^7.4.1",
+    "@babel/preset-typescript": "^7.3.3",
+    "@babel/register": "^7.6.2",
+    "@types/mocha": "latest",
+    "@istanbuljs/nyc-config-babel": "^3.0.0",
+    "babel-plugin-istanbul": "^6.0.0",
+    "mocha": "latest",
+    "typescript": "^4.2.4",
+    "nyc": "^15.1.0"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "license": "ISC"
+}
