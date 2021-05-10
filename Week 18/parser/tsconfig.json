@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
+    "target": "ES2018",
     "outDir": "./lib",
     "rootDir": ".",
+    "sourceMap": true,
     "lib": ["esnext"],
+    "strict": true,
     "noEmit": true
   },
   "include": ["src/**/*", "test/index.spec.ts"],

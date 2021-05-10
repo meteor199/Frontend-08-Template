@@ -21,4 +21,11 @@ describe("parsehtml", () => {
     assert.equal(tree.children[0].tagName, "br");
     assert.equal(tree.children[0].children.length, 0);
   });
+  it("<a id=1 a=2 >a</a>", function () {
+    let tree = parseHTML("<a id=1 a=2 >a</a>");
+    assert.equal(tree.children[0].tagName, "a");
+    assert.equal(tree.children[0].attributes[0].value, "1");
+    assert.equal(tree.children[0].attributes[1].value, "2");
+    // assert.equal(tree.children[0].children.length, 1);
+  });
 });
