@@ -13,15 +13,18 @@
     "@babel/preset-env": "^7.4.1",
     "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.6.2",
-    "@types/mocha": "latest",
     "@istanbuljs/nyc-config-babel": "^3.0.0",
+    "@types/mocha": "latest",
     "babel-plugin-istanbul": "^6.0.0",
     "mocha": "latest",
-    "typescript": "^4.2.4",
-    "nyc": "^15.1.0"
+    "nyc": "^15.1.0",
+    "typescript": "^4.2.4"
   },
   "engines": {
     "node": ">=10.0.0"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@types/assert": "^1.5.4"
+  }
 }

@@ -51,7 +51,7 @@ function emit(token: typeof currentToken) {
     currentTextNode = null;
   } else if (token!.type === "endTag") {
     if (top.tagName != token!.tagName) {
-      throw new Error("Tag start end doesn't matchi !");
+      throw new Error("Tag start end doesn't match  !");
     } else {
       stack.pop();
     }

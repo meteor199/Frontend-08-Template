@@ -924,6 +924,11 @@
   resolved "https://registry.npm.taobao.org/@istanbuljs/schema/download/@istanbuljs/schema-0.1.3.tgz?cache=0&sync_timestamp=1613227144228&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40istanbuljs%2Fschema%2Fdownload%2F%40istanbuljs%2Fschema-0.1.3.tgz#e45e384e4b8ec16bce2fd903af78450f6bf7ec98"
   integrity sha1-5F44TkuOwWvOL9kDr3hFD2v37Jg=
 
+"@types/assert@^1.5.4":
+  version "1.5.4"
+  resolved "https://registry.npm.taobao.org/@types/assert/download/@types/assert-1.5.4.tgz#87ebe83645631e188e8ec2de4f173dc39ab6f77d"
+  integrity sha1-h+voNkVjHhiOjsLeTxc9w5q2930=
+
 "@types/mocha@latest":
   version "8.2.2"
   resolved "https://registry.npm.taobao.org/@types/mocha/download/@types/mocha-8.2.2.tgz#91daa226eb8c2ff261e6a8cbf8c7304641e095e0"
