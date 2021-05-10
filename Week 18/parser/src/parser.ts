@@ -43,7 +43,6 @@ function emit(token: typeof currentToken) {
       }
     }
     top.children!.push(element);
-    // element.parent = top;
 
     if (!token!.isSelfClosing) {
       stack.push(element);
@@ -89,22 +88,24 @@ function tagOpen(c: string): ReturnType {
     };
     return tagName(c);
   } else {
-    return;
-  }
-}
-function endTagOpen(c: string): ReturnType {
-  if (c.match(/^[a-zA-Z]$/)) {
-    currentToken = {
-      type: "endTag",
-      tagName: "",
-    };
-    return tagName(c);
-  } else {
     emit({
       type: "text",
       content: c,
     });
     return data;
+  }
+}
+function endTagOpen(c: string | typeof EOF): ReturnType {
+  if (c === EOF) {
+  } else if (c.match(/^[a-zA-Z]$/)) {
+    currentToken = {
+      type: "endTag",
+      tagName: "",
+    };
+    return tagName(c);
+  } else if (c === ">") {
+    return data;
+  } else {
   }
 }
 function tagName(c: string): ReturnType {
@@ -122,11 +123,11 @@ function tagName(c: string): ReturnType {
     return tagName;
   }
 }
-function beforeAttributeName(c: string): ReturnType {
-  if (c.match(/^[\t\n\f ]$/)) {
-    return beforeAttributeName;
-  } else if (c === ">" || c === "/") {
+function beforeAttributeName(c: string | typeof EOF): ReturnType {
+  if (c === "/" || c === ">" || c === EOF) {
     return afterAttributeName(c);
+  } else if (c.match(/^[\t\n\f ]$/)) {
+    return beforeAttributeName;
   } else if (c === "=") {
   } else {
     currentAttribute = {
@@ -138,8 +139,9 @@ function beforeAttributeName(c: string): ReturnType {
   }
 }
 
-function afterAttributeName(c: string): ReturnType {
-  if (c.match(/^[\t\n\f ]$/)) {
+function afterAttributeName(c: string | typeof EOF): ReturnType {
+  if (c === EOF) {
+  } else if (c.match(/^[\t\n\f ]$/)) {
     return afterAttributeName;
   } else if (c === "/") {
     return selfClosingStartTag;
@@ -158,8 +160,8 @@ function afterAttributeName(c: string): ReturnType {
     return attributeName(c);
   }
 }
-function attributeName(c: string): ReturnType {
-  if (c.match(/^[\t\n\f ]$/) || c === "/" || c === ">") {
+function attributeName(c: string | typeof EOF): ReturnType {
+  if (c === EOF || c.match(/^[\t\n\f ]$/) || c === "/" || c === ">") {
     return afterAttributeName(c);
   } else if (c === "=") {
     return beforeAttributeValue;
@@ -170,8 +172,8 @@ function attributeName(c: string): ReturnType {
     return attributeName;
   }
 }
-function beforeAttributeValue(c: string): ReturnType {
-  if (c.match(/^[\t\n\f ]$/) || c == "/" || c == ">") {
+function beforeAttributeValue(c: string | typeof EOF): ReturnType {
+  if (c === EOF || c.match(/^[\t\n\f ]$/) || c == "/" || c == ">") {
     return beforeAttributeValue;
   } else if (c === '"') {
     return doubleQuotedAttributeValue;
@@ -179,21 +181,22 @@ function beforeAttributeValue(c: string): ReturnType {
     return singleQuoteAttributeValue;
   } else if (c === ">") {
   } else {
-    return UnquotedAttributeValue(c);
+    return unquotedAttributeValue(c);
   }
 }
-function doubleQuotedAttributeValue(c: string): ReturnType {
+function doubleQuotedAttributeValue(c: string | typeof EOF): ReturnType {
   if (c === '"') {
     currentToken![currentAttribute!.name] = currentAttribute!.value;
     return afterQuotedAttributeValue;
-  } else if (c === "\u0000") {
+  } else if (c === "\u0000" || c === EOF) {
   } else {
     currentAttribute!.value += c;
     return doubleQuotedAttributeValue;
   }
 }
-function afterQuotedAttributeValue(c: string): ReturnType {
-  if (c.match(/^[\t\n\f ]$/)) {
+function afterQuotedAttributeValue(c: string | typeof EOF): ReturnType {
+  if (c === EOF) {
+  } else if (c.match(/^[\t\n\f ]$/)) {
     return beforeAttributeName;
   } else if (c === "/") {
     return selfClosingStartTag;
@@ -202,22 +205,24 @@ function afterQuotedAttributeValue(c: string): ReturnType {
     emit(currentToken);
     return data;
   } else {
-    currentAttribute!.value += c;
-    return doubleQuotedAttributeValue;
+    // throw new Error(`unexpect character "${c}"`);
+    console.error(`unexpect character "${c}"`);
+    return attributeName;
   }
 }
-function singleQuoteAttributeValue(c: string): ReturnType {
-  if (c === "'") {
+function singleQuoteAttributeValue(c: string | typeof EOF): ReturnType {
+  if (c === "\u0000" || c === EOF) {
+  } else if (c === "'") {
     currentToken![currentAttribute!.name] = currentAttribute!.value;
     return afterQuotedAttributeValue;
-  } else if (c === "\u0000") {
   } else {
     currentAttribute!.value += c;
     return singleQuoteAttributeValue;
   }
 }
-function UnquotedAttributeValue(c: string): ReturnType {
-  if (c.match(/^[\t\n\f ]$/)) {
+function unquotedAttributeValue(c: string | typeof EOF): ReturnType {
+  if (c === EOF) {
+  } else if (c.match(/^[\t\n\f ]$/)) {
     currentToken![currentAttribute!.name] = currentAttribute!.value;
     return beforeAttributeName;
   } else if (c === "/") {
@@ -231,7 +236,7 @@ function UnquotedAttributeValue(c: string): ReturnType {
   } else if (c === "'" || c === '"' || c === "<" || c === "=" || c === "`") {
   } else {
     currentAttribute!.value += c;
-    return UnquotedAttributeValue;
+    return unquotedAttributeValue;
   }
 }
 function selfClosingStartTag(c: string): ReturnType {

@@ -4,7 +4,6 @@
     "outDir": "./lib",
     "rootDir": ".",
     "sourceMap": true,
-    "lib": ["esnext"],
     "strict": true,
     "noEmit": true
   },
