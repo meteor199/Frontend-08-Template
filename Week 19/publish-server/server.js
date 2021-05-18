@@ -1,9 +1,9 @@
 let http = require("http");
 let https = require("https");
+let request = require("request");
+
 let querystring = require("querystring");
 let unzipper = require("unzipper");
-var shttps = require("socks5-https-client");
-var Agent = require("socks5-https-client/lib/Agent");
 
 function auth(request, response) {
   let query = querystring.parse(request.url.match(/^\/auth\?([\s\S]+)$/)[1]);
@@ -16,42 +16,58 @@ function auth(request, response) {
   });
 }
 
-function getToken(code, callback) {
-  console.log("getToken", code);
-  let request = https.request(
-    {
-      hostname: "github.com",
-      port: 443,
-      method: "POST",
-      timeout: 5000,
-      socksPort: 10800,
+function requestGithub(url, method, path, headers) {
+  return new Promise((resolve, reject) => {
+    const req = request(
+      {
+        url: "https://" + url + path,
+        method: method,
+        // 假如访问github报错，请开启代理
+        // 'proxy':'http://127.0.0.1:10801',
+        headers,
+      },
+      function (error,response,body) {
+        if(error){
+          reject(error);
+          return;
+        }
+        resolve(body);
+      }
+    );
+    req.end();
+  });
+}
 
-      // agentClass: Agent,
-      // agentOptions: {
-      //   socksHost: "127.0.0.1",
-      //   socksPort: 10800,
-      // },
-      // proxy: "http://127.0.0.1:10801",
-      path: `/login/oauth/access_token?code=${code}\
+function requestGithubOld(url, method, path, headers) {
+  return new Promise((resolve, reject) => {
+    const req = request(
+      {
+        url: "https://" + url + path,
+        method: method,
+        // 'proxy':'http://127.0.0.1:10801',
+        headers,
+      },
+      function (error,response,body) {
+        if(error){
+          reject(error);
+          return;
+        }
+        resolve(body);
+      }
+    );
+    req.end();
+  });
+}
+
+function getToken(code, callback) {
+  requestGithub(
+    "github.com",
+    "POST",
+    `/login/oauth/access_token?code=${code}\
 &client_id=Iv1.d17523a7d70110e8\
-&client_secret=bbb5f143703d9d0e4d3d5b29642e0fd23e87f19b`,
-    },
-    function (response) {
-      console.log("getToken response", response);
-      let body = "";
-      response.on("data", (chunk) => {
-        body += chunk.toString();
-      });
-      response.on("end", (chunk) => {
-        callback(querystring.parse(body));
-      });
-      response.on("error", (err) => {
-        console.error("getToken error", err);
-      });
-    }
-  );
-  request.on("error", (err) => {
-    console.error(err);
+&client_secret=bbb5f143703d9d0e4d3d5b29642e0fd23e87f19b`
+  ).then((body) => {
+    callback(querystring.parse(body));
   });
 }
 function publish(request, response) {
@@ -59,6 +75,7 @@ function publish(request, response) {
   let query = querystring.parse(request.url.match(/^\/publish\?([\s\S]+)$/)[1]);
   if (query.token) {
     getUser(query.token, (info) => {
+      console.log(info);
       if (info.login === "meteor199") {
         request.pipe(unzipper.Extract({ path: "../server/public/" }));
         request.on("end", function () {
@@ -70,29 +87,12 @@ function publish(request, response) {
 }
 
 function getUser(token, callback) {
-  let request = https.request(
-    {
-      hostname: "api.github.com",
-      path: `/user`,
-      port: 443,
-      method: "GET",
-      headers: {
-        Authorization: `token ${token}`,
-        "User-Agent": "my-publish-tools",
-      },
-    },
-    function (response) {
-      let body = "";
-      response.on("data", (chunk) => {
-        body += chunk.toString();
-      });
-      response.on("end", () => {
-        callback(JSON.parse(body));
-      });
-    }
-  );
-
-  request.end();
+  requestGithub("api.github.com", "GET", `/user`, {
+    Authorization: `token ${token}`,
+    "User-Agent": "toy-publish-metor",
+  }).then((r) => {
+    callback(JSON.parse(r));
+  });
 }
 
 http
