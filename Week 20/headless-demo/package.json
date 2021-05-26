@@ -1,0 +1,9 @@
+{
+  "name": "headless-demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "puppeteer": "^9.1.1"
+  }
+}
