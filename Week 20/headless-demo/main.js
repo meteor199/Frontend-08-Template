@@ -4,11 +4,11 @@ const puppeteer = require("puppeteer");
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  await page.goto('http://localhost:8080/main.html');
+  await page.goto("https://www.baidu.com");
 
-  const a = await page.$('a');
-  const img = await page.$$('a');
+  const a = await page.$("a");
+  // const img = await page.$$("a");
 
   console.log(await a.asElement().boxModel());
-  console.log(await img.asElement().boxModel());
+  // console.log(await img.asElement().boxModel());
 })();
